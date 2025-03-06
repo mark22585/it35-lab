@@ -36,4 +36,3 @@ import {
   };
   
   export default Favorites;
-  
