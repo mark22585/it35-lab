@@ -12,6 +12,7 @@ import {
 } from '@ionic/react';
 import { logoIonic } from 'ionicons/icons';
 import { useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
 
 const AlertBox: React.FC<{ message: string; isOpen: boolean; onClose: () => void }> = ({ message, isOpen, onClose }) => {
   return (
@@ -33,18 +34,19 @@ const Login: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  // Replace Supabase login logic with your own login logic
   const doLogin = async () => {
-    // Sample authentication logic (replace with actual logic)
-    if (email === 'user@example.com' && password === 'password') {
-      setShowToast(true);
-      setTimeout(() => {
-        navigation.push('/it35-lab/app', 'forward', 'replace');
-      }, 300);
-    } else {
-      setAlertMessage('Invalid email or password');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      setAlertMessage(error.message);
       setShowAlert(true);
+      return;
     }
+
+    setShowToast(true); 
+    setTimeout(() => {
+      navigation.push('/it35-lab/app', 'forward', 'replace');
+    }, 300);
   };
   
   return (
