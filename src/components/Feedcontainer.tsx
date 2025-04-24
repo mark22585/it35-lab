@@ -24,29 +24,40 @@ const FeedContainer = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [popoverState, setPopoverState] = useState<{ open: boolean; event: Event | null; postId: string | null }>({ open: false, event: null, postId: null });
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      if (authData?.user?.email?.endsWith('@nbsc.edu.ph')) {
-        setUser(authData.user);
-        const { data: userData, error } = await supabase
-          .from('users')
-          .select('user_id, username, user_avatar_url')
-          .eq('user_email', authData.user.email)
-          .single();
-        if (!error && userData) {
-          setUser({ ...authData.user, id: userData.user_id });
-          setUsername(userData.username);
-        }
+  const [isLoading, setIsLoading] = useState(true);
+
+useEffect(() => {
+  const fetchUser = async () => {
+    const { data: authData } = await supabase.auth.getUser();
+    if (authData?.user) {
+      setUser(authData.user);
+
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('user_id, username, user_avatar_url')
+        .eq('user_email', authData.user.email)
+        .single();
+
+      if (!error && userData) {
+        setUser({ ...authData.user, id: userData.user_id });
+        setUsername(userData.username);
       }
-    };
-    const fetchPosts = async () => {
-      const { data, error } = await supabase.from('posts').select('*').order('post_created_at', { ascending: false });
-      if (!error) setPosts(data as Post[]);
-    };
-    fetchUser();
-    fetchPosts();
-  }, []);
+    }
+    setIsLoading(false);
+  };
+
+  const fetchPosts = async () => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('post_created_at', { ascending: false });
+    if (!error) setPosts(data as Post[]);
+  };
+
+  fetchUser();
+  fetchPosts();
+}, []);
+
 
   const createPost = async () => {
     if (!postContent || !user || !username) return;
