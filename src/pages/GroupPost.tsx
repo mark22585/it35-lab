@@ -18,7 +18,7 @@ const GroupPost: React.FC = () => {
       const { error } = await supabase.from('posts').insert({
         group_id: groupId,
         user_id: user.data.user.id,
-        content
+        content,
       });
 
       if (error) {
@@ -26,7 +26,7 @@ const GroupPost: React.FC = () => {
         return;
       }
 
-      history.push(`/group/${groupId}`);
+      history.push(`/it35-lab/group/${groupId}`); // Updated path here
     }
   };
 

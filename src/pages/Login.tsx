@@ -22,7 +22,7 @@ const Login: React.FC = () => {
 
       if (data.user) {
         // Redirect based on successful login
-        history.push('/home');
+        history.push('/it35-lab/home');
       }
     } catch (error) {
       alert('An error occurred during login');
@@ -65,7 +65,7 @@ const Login: React.FC = () => {
             Don’t have an account?{' '}
             <span
               style={{ color: 'blue', cursor: 'pointer' }}
-              onClick={() => history.push('/signup')}
+             onClick={() => history.push('/it35-lab/signup')}
             >
               Sign up here
             </span>

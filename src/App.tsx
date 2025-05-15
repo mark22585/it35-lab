@@ -27,15 +27,15 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        <Route exact path="/study-group" component={Login} />
-        <Route exact path="/study-group/signup" component={Signup} />
-        <Route exact path="/study-group/home" component={Home} />
-        <Route exact path="/study-group/create" component={CreateGroup} />
-        <Route exact path="/study-group/group/:id" component={GroupDetails} />
+        <Route exact path="/it35-lab" component={Login} />
+        <Route exact path="/it35-lab/signup" component={Signup} />
+        <Route exact path="/it35-lab/home" component={Home} />
+        <Route exact path="/it35-lab/create" component={CreateGroup} />
+        <Route exact path="/it35-lab/group/:id" component={GroupDetails} />
 
-        {/* Redirect root to /study-group */}
+        {/* Redirect root to /it35-lab */}
         <Route exact path="/">
-          <Redirect to="/study-group" />
+          <Redirect to="/it35-lab" />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

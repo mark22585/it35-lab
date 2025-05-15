@@ -1,3 +1,4 @@
+// Signup.tsx
 import {
   IonPage,
   IonHeader,
@@ -30,7 +31,6 @@ const Signup: React.FC = () => {
 
     const user = data?.user;
     if (user) {
-      // Insert user data into the users table
       const { error: insertError } = await supabase.from('users').insert({
         id: user.id,
         email,
@@ -39,8 +39,7 @@ const Signup: React.FC = () => {
 
       if (insertError) return alert(insertError.message);
 
-      // Redirect to the home page after successful sign up
-      history.push('/home');
+      history.push('/it35-lab/home'); // ✅ Corrected path
     }
   };
 
@@ -91,7 +90,7 @@ const Signup: React.FC = () => {
             Already have an account?{' '}
             <span
               style={{ color: 'blue', cursor: 'pointer' }}
-              onClick={() => history.push('/login')}
+              onClick={() => history.push('/it35-lab')} // ✅ Corrected
             >
               Login here
             </span>
