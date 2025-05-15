@@ -1,62 +1,95 @@
-import { 
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
   IonButton,
-    IonButtons,
-      IonContent, 
-      IonHeader, 
-      IonIcon, 
-      IonLabel, 
-      IonMenuButton, 
-      IonPage, 
-      IonRouterOutlet, 
-      IonTabBar, 
-      IonTabButton, 
-      IonTabs, 
-      IonTitle, 
-      IonToolbar 
-  } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { bookOutline, search, star } from 'ionicons/icons';
-import { Route, Redirect } from 'react-router';
+} from '@ionic/react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import { useHistory } from 'react-router-dom';
 
-import Favorites from './home-tabs/Favorites';
-import Feed from './home-tabs/Feed';
-import Search from './home-tabs/Search';
-  
-  const Home: React.FC = () => {
+// Define a type for the group
+interface Group {
+  id: string; // Change to number if your group id is numeric in Supabase
+  name: string;
+  description: string;
+}
 
-    const tabs = [
-      {name:'Feed', tab:'feed',url: '/it35-lab/app/home/feed', icon: bookOutline},
-      {name:'Search', tab:'search', url: '/it35-lab/app/home/search', icon: search},
-      {name:'Favorites',tab:'favorites', url: '/it35-lab/app/home/favorites', icon: star},
-    ]
-    
-    return (
-      <IonReactRouter>
-        <IonTabs>
-          <IonTabBar slot="bottom">
+const Home: React.FC = () => {
+  const [role, setRole] = useState('');
+  const [groups, setGroups] = useState<Group[]>([]);
+  const history = useHistory();
 
-            {tabs.map((item, index) => (
-              <IonTabButton key={index} tab={item.tab} href={item.url}>
-                <IonIcon icon={item.icon} />
-                <IonLabel>{item.name}</IonLabel>
-              </IonTabButton>
-            ))}
-            
-          </IonTabBar>
-        <IonRouterOutlet>
+  useEffect(() => {
+    const checkUser = async () => {
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) {
+        console.log('No user logged in, redirecting to login page...');
+        history.push('/login');
+        return;
+      }
 
-          <Route exact path="/it35-lab/app/home/feed" render={Feed} />
-          <Route exact path="/it35-lab/app/home/search" render={Search} />
-          <Route exact path="/it35-lab/app/home/favorites" render={Favorites} />
+      const userId = user.data.user.id;
+      console.log('Logged in user:', userId);
 
-          <Route exact path="/it35-lab/app/home">
-            <Redirect to="/it35-lab/app/home/feed" />
-          </Route>
+      // Fetch user role from 'users' table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', userId)
+        .single();
 
-        </IonRouterOutlet>
-        </IonTabs>
-      </IonReactRouter>
-    );
-  };
-  
-  export default Home;
+      if (userError || !userData) {
+        console.error('Error fetching user role:', userError);
+        return;
+      }
+
+      setRole(userData.role);
+      console.log('Fetched role:', userData.role);
+
+      // Fetch all groups
+      const { data: groupsData, error: groupsError } = await supabase
+        .from('groups')
+        .select('*');
+
+      if (groupsError) {
+        console.error('Error fetching groups:', groupsError);
+      } else {
+        setGroups(groupsData || []);
+      }
+    };
+
+    checkUser();
+  }, [history]);
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Group List</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+
+      <IonContent className="ion-padding">
+        {role === 'Teacher' && (
+          <IonButton expand="full" onClick={() => history.push('/create')}>
+            Create Group
+          </IonButton>
+        )}
+
+        {groups.map((group) => (
+          <div key={group.id} className="ion-padding">
+            <h3>{group.name}</h3>
+            <IonButton expand="full" onClick={() => history.push(`/group/${group.id}`)}>
+              View
+            </IonButton>
+          </div>
+        ))}
+      </IonContent>
+    </IonPage>
+  );
+};
+
+export default Home;
